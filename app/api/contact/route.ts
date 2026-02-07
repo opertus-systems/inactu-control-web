@@ -7,6 +7,14 @@ type ContactPayload = {
   message: string;
 };
 
+function isSameOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return true;
+  }
+  return origin === request.nextUrl.origin;
+}
+
 function validate(payload: Partial<ContactPayload>) {
   if (!payload.name || payload.name.trim().length < 2) {
     return "Please provide your name.";
@@ -20,10 +28,22 @@ function validate(payload: Partial<ContactPayload>) {
     return "Please provide a message with at least 20 characters.";
   }
 
+  if (payload.name.length > 200 || payload.email.length > 320 || (payload.company && payload.company.length > 200)) {
+    return "One or more fields exceed allowed length.";
+  }
+
+  if (payload.message.length > 5000) {
+    return "Message is too long.";
+  }
+
   return null;
 }
 
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Origin not allowed." }, { status: 403 });
+  }
+
   let body: Partial<ContactPayload>;
 
   try {
@@ -49,12 +69,19 @@ export async function POST(request: NextRequest) {
 
   if (webhookUrl) {
     try {
+      const parsed = new URL(webhookUrl);
+      const isLocalHttp = parsed.protocol === "http:" && (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
+      if (!isLocalHttp && parsed.protocol !== "https:") {
+        return NextResponse.json({ error: "Contact webhook URL must use https." }, { status: 500 });
+      }
+
       const webhookResponse = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "content-type": "application/json"
         },
-        body: JSON.stringify(submission)
+        body: JSON.stringify(submission),
+        signal: AbortSignal.timeout(5_000)
       });
 
       if (!webhookResponse.ok) {
@@ -75,7 +102,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  console.info("Contact submission received", submission);
+  console.info("Contact submission received", {
+    emailDomain: submission.email.split("@")[1] ?? "unknown",
+    hasCompany: Boolean(submission.company),
+    submittedAt: submission.submittedAt
+  });
 
   return NextResponse.json({ ok: true });
 }

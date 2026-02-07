@@ -2,7 +2,13 @@
 set -euo pipefail
 
 API_BASE="${API_BASE:-http://localhost:8080}"
-EXAMPLES_DIR="${EXAMPLES_DIR:-../examples}"
+EXAMPLES_DIR="${EXAMPLES_DIR:-../inactu-control/examples}"
+
+if [[ ! -d "$EXAMPLES_DIR" ]]; then
+  echo "error: examples dir not found: $EXAMPLES_DIR" >&2
+  echo "set EXAMPLES_DIR to the inactu-control examples path (for example ../inactu-control/examples)" >&2
+  exit 1
+fi
 
 echo "==> Quickstart check against ${API_BASE}"
 

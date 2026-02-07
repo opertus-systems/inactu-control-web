@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const specPath = path.resolve(process.cwd(), "..", "openapi.yaml");
+    const specPath = path.resolve(process.cwd(), "public", "openapi.yaml");
     const spec = await fs.readFile(specPath, "utf8");
 
     return new NextResponse(spec, {
@@ -14,9 +14,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Unable to load OpenAPI spec", details: (error as Error).message },
-      { status: 500 }
-    );
+    console.error("Unable to load OpenAPI spec", error);
+    return NextResponse.json({ error: "Unable to load OpenAPI spec" }, { status: 500 });
   }
 }

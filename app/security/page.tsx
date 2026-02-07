@@ -40,6 +40,15 @@ export default function SecurityPage() {
             </p>
           </div>
           <div className="controls-row">
+            <p>Web surface governance</p>
+            <p>Web console changes are gated by CI, security checks, and repository policies.</p>
+            <p>
+              <a href="https://github.com/opertus-systems/inactu-control-web" target="_blank" rel="noreferrer">
+                inactu-control-web
+              </a>
+            </p>
+          </div>
+          <div className="controls-row">
             <p>Cryptographic verification</p>
             <p>Manifest and receipt verification paths are deterministic and testable.</p>
             <p>

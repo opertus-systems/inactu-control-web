@@ -4,7 +4,19 @@ import { getDbPool } from "../../../../lib/db";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function isSameOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return true;
+  }
+  return origin === request.nextUrl.origin;
+}
+
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Origin not allowed." }, { status: 403 });
+  }
+
   const body = await request.json().catch(() => null);
   const email = body?.email?.trim().toLowerCase();
   const password = body?.password;
@@ -15,6 +27,9 @@ export async function POST(request: NextRequest) {
 
   if (typeof password !== "string" || password.length < 10) {
     return NextResponse.json({ error: "Password must be at least 10 characters." }, { status: 400 });
+  }
+  if (email.length > 320 || password.length > 512) {
+    return NextResponse.json({ error: "Email or password exceeds allowed length." }, { status: 400 });
   }
 
   const passwordHash = await hash(password, 12);
