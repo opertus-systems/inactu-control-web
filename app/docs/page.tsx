@@ -182,8 +182,16 @@ export default function DocsPage() {
           API base: <code>{apiBase}</code>
         </p>
         <div className="cta-row">
+          <a
+            className="btn btn-secondary"
+            href="https://github.com/opertus-systems/inactu-control-web"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Web Repo
+          </a>
           <a className="btn btn-secondary" href="https://github.com/opertus-systems/inactu-control" target="_blank" rel="noreferrer">
-            GitHub Repo
+            API Repo
           </a>
           <a
             className="btn btn-secondary"
@@ -225,14 +233,17 @@ export default function DocsPage() {
           exits non-zero on the first failure.
         </p>
         <pre className="code-block">{`# Step 0: clone and install
-git clone https://github.com/opertus-systems/inactu-control.git
-cd inactu-control/web
+git clone https://github.com/opertus-systems/inactu-control-web.git
+cd inactu-control-web
 npm install
 
 # Terminal 1: start API
-npm run run:api
+git clone https://github.com/opertus-systems/inactu-control.git ../inactu-control
+cd ../inactu-control
+cargo run -p inactu-control --features web --bin inactu-control-web
 
 # Terminal 2: run baseline checks
+cd ../inactu-control-web
 API_BASE="${apiBase}" npm run quickstart:check`}</pre>
         <div className="grid two-up">
           <article>
@@ -259,7 +270,7 @@ API_BASE="${apiBase}" npm run quickstart:check`}</pre>
           </article>
           <article>
             <h3>Script source</h3>
-            <pre className="code-block">{`web/scripts/quickstart-check.sh`}</pre>
+            <pre className="code-block">{`scripts/quickstart-check.sh`}</pre>
           </article>
         </div>
       </section>

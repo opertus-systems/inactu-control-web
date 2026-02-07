@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "run:api": "echo 'Run API in separate repo: https://github.com/opertus-systems/inactu-control'",
     "quickstart:check": "bash ./scripts/quickstart-check.sh",
     "build": "next build",
     "start": "next start",

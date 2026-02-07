@@ -7,7 +7,8 @@ const nav = [
   { href: "/about", label: "About" },
   { href: "/security", label: "Security" },
   { href: "/docs", label: "Docs" },
-  { href: "https://github.com/opertus-systems/inactu-control", label: "GitHub", external: true },
+  { href: "https://github.com/opertus-systems/inactu-control-web", label: "Web Repo", external: true },
+  { href: "https://github.com/opertus-systems/inactu-control", label: "API Repo", external: true },
   {
     href: "https://github.com/opertus-systems/inactu-control/blob/main/openapi.yaml",
     label: "API Spec",
@@ -42,7 +43,7 @@ export function Header() {
             </Link>
             <a
               className="btn btn-primary"
-              href="https://github.com/opertus-systems/inactu-control"
+              href="https://github.com/opertus-systems/inactu-control-web"
               target="_blank"
               rel="noreferrer"
             >

@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Node.js requirement: `>= 18.17.0` (Next.js 14 requirement).
+Node.js requirement: `>= 20.9.0`.
 
 Set the backend API base URL in `.env.local`:
 
@@ -22,6 +22,9 @@ DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/inactu_control
 INACTU_API_BASE_URL=http://localhost:8080
 INACTU_API_AUTH_SECRET=replace-with-the-same-shared-secret-as-api
 ```
+
+Use `INACTU_API_BASE_URL` (server-side) for authenticated API bridge calls.
+`NEXT_PUBLIC_INACTU_API_BASE_URL` is only for client-facing display and docs UI.
 
 ## Auth scaffold
 
@@ -69,3 +72,9 @@ VERCEL_TOKEN=your_token VERCEL_SCOPE=your_team npm run vercel:env:sync:prod
 ```
 
 The Rust control-plane API should run separately (for example on Fly.io, Render, Railway, or ECS), and the Next.js app calls it.
+
+## Security defaults
+
+- Web-to-API bridge tokens are short-lived (`5m`) and include `jti`.
+- OpenAPI proxy route is allowlisted to verification endpoints only.
+- Security headers are set in `next.config.mjs`.

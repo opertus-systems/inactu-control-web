@@ -16,8 +16,11 @@ export function Footer() {
           <Link href="/about">About</Link>
           <Link href="/security">Security</Link>
           <Link href="/contact">Contact</Link>
+          <a href="https://github.com/opertus-systems/inactu-control-web" target="_blank" rel="noreferrer">
+            Web Repo
+          </a>
           <a href="https://github.com/opertus-systems/inactu-control" target="_blank" rel="noreferrer">
-            GitHub
+            API Repo
           </a>
           <a
             href="https://github.com/opertus-systems/inactu-control/blob/main/openapi.yaml"
