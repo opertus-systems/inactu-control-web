@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const MAX_PROXY_BODY_BYTES = 1_000_000;
+
 function getApiBaseUrl() {
   const value = process.env.PROVENACT_API_BASE_URL;
   if (!value) {
@@ -63,7 +65,7 @@ async function proxyRequest(request: NextRequest, method: string, path: string[]
   }
 
   const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > 1_000_000) {
+  if (Number.isFinite(contentLength) && contentLength > MAX_PROXY_BODY_BYTES) {
     return NextResponse.json({ error: "Request body too large." }, { status: 413 });
   }
 
@@ -73,11 +75,19 @@ async function proxyRequest(request: NextRequest, method: string, path: string[]
   const upstreamHeaders = buildUpstreamHeaders(request);
 
   const hasBody = !["GET", "HEAD"].includes(method);
+  let body: Uint8Array | undefined;
+  if (hasBody) {
+    const raw = new Uint8Array(await request.arrayBuffer());
+    if (raw.byteLength > MAX_PROXY_BODY_BYTES) {
+      return NextResponse.json({ error: "Request body too large." }, { status: 413 });
+    }
+    body = raw;
+  }
+
   const upstreamResponse = await fetch(upstreamUrl, {
     method,
     headers: upstreamHeaders,
-    body: hasBody ? request.body : undefined,
-    duplex: hasBody ? "half" : undefined,
+    body,
     cache: "no-store",
     signal: AbortSignal.timeout(10_000)
   } as RequestInit);
