@@ -10,7 +10,7 @@ type ContactPayload = {
 function isSameOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   if (!origin) {
-    return true;
+    return false;
   }
   return origin === request.nextUrl.origin;
 }
