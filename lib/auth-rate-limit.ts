@@ -50,7 +50,11 @@ function requestIp(headers: unknown): string {
 
 function attemptKey(headers: unknown, email?: string): string {
   const ip = requestIp(headers);
-  return `${ip}:${email ?? "unknown"}`;
+  if (ip !== "unknown") {
+    return `${ip}:${email ?? "unknown"}`;
+  }
+  const ua = extractHeader(headers, "user-agent")?.slice(0, 200) ?? "unknown-ua";
+  return `${ip}:${ua}:${email ?? "unknown"}`;
 }
 
 async function isRateLimited(
