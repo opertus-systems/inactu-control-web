@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildClientResponseHeaders } from "../../../../../lib/openapi-proxy";
 
 const MAX_PROXY_BODY_BYTES = 1_000_000;
 
@@ -92,10 +93,7 @@ async function proxyRequest(request: NextRequest, method: string, path: string[]
     signal: AbortSignal.timeout(10_000)
   } as RequestInit);
 
-  const responseHeaders = new Headers(upstreamResponse.headers);
-  responseHeaders.delete("content-encoding");
-  responseHeaders.delete("transfer-encoding");
-  responseHeaders.delete("connection");
+  const responseHeaders = buildClientResponseHeaders(upstreamResponse.headers);
 
   return new NextResponse(upstreamResponse.body, {
     status: upstreamResponse.status,
