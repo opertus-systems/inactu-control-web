@@ -80,7 +80,7 @@ function requestIp(headers: unknown): string | null {
   const proxyHops = trustedProxyHops();
 
   const forwarded = extractHeader(headers, "x-forwarded-for");
-  if (forwarded) {
+  if (forwarded !== null) {
     const chain = forwarded
       .split(",")
       .map((value) => normalizeIpCandidate(value))
@@ -88,6 +88,8 @@ function requestIp(headers: unknown): string | null {
     if (chain.length >= proxyHops) {
       return chain[chain.length - proxyHops] ?? null;
     }
+    // Fail closed when forwarded headers are present but malformed.
+    return null;
   }
 
   const directCandidates = [

@@ -58,10 +58,20 @@ describe("buildRateLimitKey", () => {
     expect(key).toBe("ip:198.51.100.12|email:alice@example.com");
   });
 
-  it("ignores invalid forwarded values and falls back to other trusted ip headers", () => {
+  it("fails closed when forwarded chain is malformed", () => {
     process.env.TRUST_PROXY_HEADERS = "true";
     const key = buildRateLimitKey(
       { "x-forwarded-for": "definitely-not-an-ip", "x-real-ip": "198.51.100.7" },
+      "alice@example.com"
+    );
+
+    expect(key).toBe("email:alice@example.com");
+  });
+
+  it("uses x-real-ip when forwarded chain is absent", () => {
+    process.env.TRUST_PROXY_HEADERS = "true";
+    const key = buildRateLimitKey(
+      { "x-real-ip": "198.51.100.7" },
       "alice@example.com"
     );
 
