@@ -13,6 +13,9 @@ function normalizeControlApiPath(path: string): string {
   if (!path.startsWith("/") || path.startsWith("//") || path.includes("://")) {
     throw new Error("Control API path must be an absolute in-origin path.");
   }
+  if (path.split("").some((char) => char <= "\u001f" || char === "\u007f")) {
+    throw new Error("Control API path contains control characters.");
+  }
   if (path.includes("\\") || path.includes("%") || path.includes("?") || path.includes("#")) {
     throw new Error("Control API path contains disallowed characters.");
   }
@@ -59,6 +62,7 @@ export async function controlApiFetch(path: string, userId: string, init?: Reque
       ...init,
       headers,
       cache: "no-store",
+      redirect: "error",
       signal: AbortSignal.timeout(controlApiTimeoutMs())
     });
   } catch (error) {
