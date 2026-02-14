@@ -77,6 +77,7 @@ describe("controlApiFetch", () => {
       "/v1//packages",
       "/v1/../packages",
       "/v1/%2e%2e/packages",
+      "/v1/packages\nx-injected: y",
       "/v1/packages?debug=true",
       "/v1/packages#frag",
       "/v1\\packages"
@@ -96,5 +97,22 @@ describe("controlApiFetch", () => {
       expect(fetchSpy).not.toHaveBeenCalled();
       vi.unstubAllGlobals();
     }
+  });
+
+  it("disables redirects when forwarding control API requests", async () => {
+    createControlApiTokenMock.mockResolvedValueOnce("token-abc");
+    requireProvenactApiBaseUrlMock.mockReturnValueOnce("https://api.example.test");
+    const fetchSpy = vi.fn().mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchSpy);
+
+    const response = await controlApiFetch("/v1/packages", "user-123", { method: "GET" });
+
+    expect(response.status).toBe(200);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [, options] = fetchSpy.mock.calls[0] as [string, RequestInit];
+    expect(options.cache).toBe("no-store");
+    expect(options.redirect).toBe("error");
+    expect(options.headers).toBeInstanceOf(Headers);
+    expect((options.headers as Headers).get("authorization")).toBe("Bearer token-abc");
   });
 });
